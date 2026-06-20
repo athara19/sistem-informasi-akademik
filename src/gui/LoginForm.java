@@ -1,10 +1,13 @@
 package gui;
 
 import javax.swing.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 
 public class LoginForm extends JFrame {
 
     public LoginForm() {
+
         setTitle("Login");
         setSize(400, 250);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -20,18 +23,44 @@ public class LoginForm extends JFrame {
 
         setLayout(null);
 
-        lblUser.setBounds(50, 40, 100, 25);
-        txtUser.setBounds(150, 40, 150, 25);
+        lblUser.setBounds(50,40,100,25);
+        txtUser.setBounds(150,40,150,25);
 
-        lblPass.setBounds(50, 80, 100, 25);
-        txtPass.setBounds(150, 80, 150, 25);
+        lblPass.setBounds(50,80,100,25);
+        txtPass.setBounds(150,80,150,25);
 
-        btnLogin.setBounds(150, 130, 100, 30);
+        btnLogin.setBounds(150,130,100,30);
 
         add(lblUser);
         add(txtUser);
         add(lblPass);
         add(txtPass);
         add(btnLogin);
+
+        // EVENT LOGIN
+        btnLogin.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+
+                String username = txtUser.getText();
+                String password = String.valueOf(txtPass.getPassword());
+
+                if(username.equals("admin") && password.equals("123")) {
+
+                    DashboardForm dashboard = new DashboardForm();
+                    dashboard.setVisible(true);
+
+                    dispose(); // menutup LoginForm
+
+                } else {
+
+                    JOptionPane.showMessageDialog(
+                            null,
+                            "Username atau Password Salah!"
+                    );
+
+                }
+            }
+        });
     }
 }
