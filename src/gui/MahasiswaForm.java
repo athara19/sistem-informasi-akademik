@@ -7,103 +7,111 @@ import java.awt.*;
 
 public class MahasiswaForm extends JFrame {
 
+    private Mahasiswa mahasiswa;
+
     public MahasiswaForm() {
 
-        setTitle("Profil Mahasiswa");
-        setSize(500, 350);
-        setLocationRelativeTo(null);
-        setDefaultCloseOperation(EXIT_ON_CLOSE);
-        setLayout(new BorderLayout());
-
-        // ================= DATA =================
-        Mahasiswa mhs = new Mahasiswa(
-                "M001",
+        mahasiswa = new Mahasiswa(
+                "231001",
                 "Budi Santoso",
                 "Informatika",
-                3
+                4
         );
 
-        // ================= HEADER =================
-        JPanel header = new JPanel();
-        header.setBackground(new Color(41, 128, 185));
-        header.setPreferredSize(new Dimension(500, 50));
+        setTitle("Dashboard Mahasiswa");
+        setSize(600, 500);
+        setLocationRelativeTo(null);
+        setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 
-        JLabel title = new JLabel("PROFIL MAHASISWA");
-        title.setForeground(Color.WHITE);
-        title.setFont(new Font("SansSerif", Font.BOLD, 18));
+        setLayout(new BorderLayout());
 
-        header.add(title);
+        // Header
+        JLabel lblTitle = new JLabel(
+                "SISTEM INFORMASI AKADEMIK MAHASISWA",
+                SwingConstants.CENTER
+        );
 
-        // ================= BODY (GRID RAPI) =================
-        JPanel body = new JPanel(new GridBagLayout());
-        body.setBorder(BorderFactory.createEmptyBorder(20, 30, 20, 30));
+        lblTitle.setFont(new Font("Arial", Font.BOLD, 18));
+        lblTitle.setBorder(BorderFactory.createEmptyBorder(20,10,20,10));
 
-        GridBagConstraints gbc = new GridBagConstraints();
-        gbc.insets = new Insets(10, 10, 10, 10);
-        gbc.fill = GridBagConstraints.HORIZONTAL;
+        add(lblTitle, BorderLayout.NORTH);
 
-        Font labelFont = new Font("SansSerif", Font.BOLD, 13);
+        // Menu
+        JPanel menuPanel = new JPanel();
+        menuPanel.setLayout(new GridLayout(7,1,10,10));
+        menuPanel.setBorder(BorderFactory.createEmptyBorder(20,50,20,50));
 
-        // ID
-        gbc.gridx = 0;
-        gbc.gridy = 0;
-        JLabel l1 = new JLabel("ID");
-        l1.setFont(labelFont);
-        body.add(l1, gbc);
+        JButton btnProfil = new JButton("Lihat Profil");
+        JButton btnKRS = new JButton("Ambil Mata Kuliah (KRS)");
+        JButton btnJadwal = new JButton("Lihat Jadwal");
+        JButton btnNilai = new JButton("Lihat Nilai");
+        JButton btnKHS = new JButton("Lihat KHS");
+        JButton btnTranskrip = new JButton("Lihat Transkrip");
+        JButton btnLogout = new JButton("Logout");
 
-        gbc.gridx = 1;
-        body.add(new JLabel(mhs.getId()), gbc);
+        menuPanel.add(btnProfil);
+        menuPanel.add(btnKRS);
+        menuPanel.add(btnJadwal);
+        menuPanel.add(btnNilai);
+        menuPanel.add(btnKHS);
+        menuPanel.add(btnTranskrip);
+        menuPanel.add(btnLogout);
 
-        // Nama
-        gbc.gridx = 0;
-        gbc.gridy = 1;
-        JLabel l2 = new JLabel("Nama");
-        l2.setFont(labelFont);
-        body.add(l2, gbc);
+        add(menuPanel, BorderLayout.CENTER);
 
-        gbc.gridx = 1;
-        body.add(new JLabel(mhs.getNama()), gbc);
+        // Event
+        btnProfil.addActionListener(e -> {
 
-        // Prodi
-        gbc.gridx = 0;
-        gbc.gridy = 2;
-        JLabel l3 = new JLabel("Prodi");
-        l3.setFont(labelFont);
-        body.add(l3, gbc);
+            JOptionPane.showMessageDialog(this,
+                    "NIM : " + mahasiswa.getNim() +
+                            "\nNama : " + mahasiswa.getNama() +
+                            "\nProdi : " + mahasiswa.getProdi() +
+                            "\nSemester : " + mahasiswa.getSemester()
+            );
 
-        gbc.gridx = 1;
-        body.add(new JLabel(mhs.getProdi()), gbc);
-
-        // Semester
-        gbc.gridx = 0;
-        gbc.gridy = 3;
-        JLabel l4 = new JLabel("Semester");
-        l4.setFont(labelFont);
-        body.add(l4, gbc);
-
-        gbc.gridx = 1;
-        body.add(new JLabel(String.valueOf(mhs.getSemester())), gbc);
-
-        // ================= FOOTER =================
-        JPanel footer = new JPanel();
-        footer.setPreferredSize(new Dimension(500, 60));
-
-        JButton btnBack = new JButton("Kembali");
-
-        btnBack.setBackground(new Color(231, 76, 60));
-        btnBack.setForeground(Color.WHITE);
-        btnBack.setFocusPainted(false);
-
-        footer.add(btnBack);
-
-        btnBack.addActionListener(e -> {
-            new DashboardForm().setVisible(true);
-            dispose();
         });
 
-        // ================= ADD =================
-        add(header, BorderLayout.NORTH);
-        add(body, BorderLayout.CENTER);
-        add(footer, BorderLayout.SOUTH);
+        btnKRS.addActionListener(e ->
+                JOptionPane.showMessageDialog(this,
+                        "Menu Pengambilan KRS")
+        );
+
+        btnJadwal.addActionListener(e ->
+                JOptionPane.showMessageDialog(this,
+                        "Menu Jadwal Kuliah")
+        );
+
+        btnNilai.addActionListener(e ->
+                JOptionPane.showMessageDialog(this,
+                        "Menu Nilai")
+        );
+
+        btnKHS.addActionListener(e ->
+                JOptionPane.showMessageDialog(this,
+                        "Menu KHS")
+        );
+
+        btnTranskrip.addActionListener(e ->
+                JOptionPane.showMessageDialog(this,
+                        "Menu Transkrip Nilai")
+        );
+
+        btnLogout.addActionListener(e -> {
+
+            int pilih = JOptionPane.showConfirmDialog(
+                    this,
+                    "Yakin ingin logout?",
+                    "Logout",
+                    JOptionPane.YES_NO_OPTION
+            );
+
+            if (pilih == JOptionPane.YES_OPTION) {
+
+                new LoginForm().setVisible(true);
+                dispose();
+
+            }
+
+        });
     }
 }
