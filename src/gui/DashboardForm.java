@@ -10,6 +10,7 @@ public class DashboardForm extends JFrame {
         setSize(500,400);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLocationRelativeTo(null);
+        setLayout(null);
 
         JButton btnMahasiswa = new JButton("Data Mahasiswa");
         JButton btnDosen = new JButton("Data Dosen");
@@ -17,8 +18,6 @@ public class DashboardForm extends JFrame {
         JButton btnKRS = new JButton("KRS");
         JButton btnNilai = new JButton("Nilai");
         JButton btnKHS = new JButton("KHS");
-
-        setLayout(null);
 
         btnMahasiswa.setBounds(150,40,200,30);
         btnDosen.setBounds(150,90,200,30);
@@ -33,5 +32,11 @@ public class DashboardForm extends JFrame {
         add(btnKRS);
         add(btnNilai);
         add(btnKHS);
+
+        // Membuka MahasiswaForm
+        btnMahasiswa.addActionListener(e -> {
+            new MahasiswaForm().setVisible(true);
+            dispose(); // menutup dashboard
+        });
     }
 }
