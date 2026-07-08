@@ -2,77 +2,210 @@ package dao;
 
 import database.KoneksiDB;
 import model.MataKuliah;
+
+import javax.swing.*;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
 public class MataKuliahDAO {
 
-    public void insertMatkul(MataKuliah mk) throws SQLException {
-        String sql = "INSERT INTO tbl_matakuliah (kode_mk, nama_mk, sks, nidn) VALUES (?, ?, ?, ?)";
-        try (Connection conn = KoneksiDB.getConnection();
-             PreparedStatement pstmt = conn.prepareStatement(sql)) {
-            pstmt.setString(1, mk.getKodeMk());
-            pstmt.setString(2, mk.getNamaMk());
-            pstmt.setInt(3, mk.getSks());
-            pstmt.setString(4, mk.getNidn());
-            pstmt.executeUpdate();
-        } catch (SQLIntegrityConstraintViolationException e) {
-            throw new SQLException("Gagal! Kode Mata Kuliah sudah ada atau NIDN tidak ditemukan.");
+    public boolean insertMatkul(MataKuliah mk) {
+
+        try {
+
+            String sql =
+                    "INSERT INTO tbl_matakuliah(kode_mk,nama_mk,sks,nidn) VALUES(?,?,?,?)";
+
+            Connection conn = KoneksiDB.getConnection();
+
+            PreparedStatement ps = conn.prepareStatement(sql);
+
+            ps.setString(1, mk.getKodeMk());
+            ps.setString(2, mk.getNamaMk());
+            ps.setInt(3, mk.getSks());
+            ps.setString(4, mk.getNidn());
+
+            int hasil = ps.executeUpdate();
+
+            System.out.println("HASIL INSERT = " + hasil);
+            Statement st = conn.createStatement();
+            ResultSet rs = st.executeQuery("SELECT DATABASE()");
+            if(rs.next()){
+                System.out.println("DATABASE JAVA = " + rs.getString(1));
+            }
+
+            ResultSet rs2 = st.executeQuery("SELECT COUNT(*) FROM tbl_matakuliah");
+            if(rs2.next()){
+                System.out.println("COUNT JAVA = " + rs2.getInt(1));
+            }
+
+            return hasil > 0;
+
+        } catch (Exception e) {
+
+            e.printStackTrace();
+
+            JOptionPane.showMessageDialog(null, e.toString());
+
+            return false;
+
         }
+
     }
 
-    public void updateMatkul(MataKuliah mk) throws SQLException {
-        String sql = "UPDATE tbl_matakuliah SET nama_mk=?, sks=?, nidn=? WHERE kode_mk=?";
-        try (Connection conn = KoneksiDB.getConnection();
-             PreparedStatement pstmt = conn.prepareStatement(sql)) {
-            pstmt.setString(1, mk.getNamaMk());
-            pstmt.setInt(2, mk.getSks());
-            pstmt.setString(3, mk.getNidn());
-            pstmt.setString(4, mk.getKodeMk());
-            pstmt.executeUpdate();
-        } catch (SQLIntegrityConstraintViolationException e) {
-            throw new SQLException("Gagal! Pastikan NIDN Dosen valid.");
+    public boolean updateMatkul(MataKuliah mk) {
+
+        try {
+
+            String sql =
+                    "UPDATE tbl_matakuliah SET nama_mk=?,sks=?,nidn=? WHERE kode_mk=?";
+
+            Connection conn = KoneksiDB.getConnection();
+
+            PreparedStatement ps = conn.prepareStatement(sql);
+
+            ps.setString(1, mk.getNamaMk());
+            ps.setInt(2, mk.getSks());
+            ps.setString(3, mk.getNidn());
+            ps.setString(4, mk.getKodeMk());
+
+            ps.executeUpdate();
+
+            return true;
+
+        } catch (Exception e) {
+
+            e.printStackTrace();
+
+            return false;
+
         }
+
     }
 
-    public void deleteMatkul(String kodeMk) throws SQLException {
-        String sql = "DELETE FROM tbl_matakuliah WHERE kode_mk=?";
-        try (Connection conn = KoneksiDB.getConnection();
-             PreparedStatement pstmt = conn.prepareStatement(sql)) {
-            pstmt.setString(1, kodeMk);
-            pstmt.executeUpdate();
-        } catch (SQLIntegrityConstraintViolationException e) {
-            throw new SQLException("Tidak bisa dihapus! Mata kuliah ini sedang diambil oleh mahasiswa (KRS).");
+    public boolean deleteMatkul(String kodeMk) {
+
+        try {
+
+            String sql =
+                    "DELETE FROM tbl_matakuliah WHERE kode_mk=?";
+
+            Connection conn = KoneksiDB.getConnection();
+
+            PreparedStatement ps = conn.prepareStatement(sql);
+
+            ps.setString(1, kodeMk);
+
+            ps.executeUpdate();
+
+            return true;
+
+        } catch (Exception e) {
+
+            e.printStackTrace();
+
+            return false;
+
         }
+
     }
 
-    public List<MataKuliah> getAllMatkul() throws SQLException {
+    public List<MataKuliah> getAllMatkul() {
+
         List<MataKuliah> list = new ArrayList<>();
-        String sql = "SELECT * FROM tbl_matakuliah";
-        try (Connection conn = KoneksiDB.getConnection();
-             Statement stmt = conn.createStatement();
-             ResultSet rs = stmt.executeQuery(sql)) {
+
+        try {
+
+            Connection conn = KoneksiDB.getConnection();
+
+            Statement st = conn.createStatement();
+
+            ResultSet rs = st.executeQuery(
+                    "SELECT * FROM tbl_matakuliah");
+
             while (rs.next()) {
-                list.add(new MataKuliah(rs.getString("kode_mk"), rs.getString("nama_mk"), rs.getInt("sks"), rs.getString("nidn")));
+
+                list.add(
+
+                        new MataKuliah(
+
+                                rs.getString("kode_mk"),
+
+                                rs.getString("nama_mk"),
+
+                                rs.getInt("sks"),
+
+                                rs.getString("nidn")
+
+                        )
+
+                );
+
             }
+
+        } catch (Exception e) {
+
+            e.printStackTrace();
+
         }
+
         return list;
+
     }
 
-    public List<MataKuliah> searchMatkul(String keyword) throws SQLException {
+    public List<MataKuliah> searchMatkul(String keyword) {
+
         List<MataKuliah> list = new ArrayList<>();
-        String sql = "SELECT * FROM tbl_matakuliah WHERE nama_mk LIKE ? OR kode_mk LIKE ?";
-        try (Connection conn = KoneksiDB.getConnection();
-             PreparedStatement pstmt = conn.prepareStatement(sql)) {
-            pstmt.setString(1, "%" + keyword + "%");
-            pstmt.setString(2, "%" + keyword + "%");
-            try (ResultSet rs = pstmt.executeQuery()) {
-                while (rs.next()) {
-                    list.add(new MataKuliah(rs.getString("kode_mk"), rs.getString("nama_mk"), rs.getInt("sks"), rs.getString("nidn")));
-                }
+
+        try {
+
+            Connection conn = KoneksiDB.getConnection();
+
+            String sql =
+                    """
+                    SELECT *
+                    FROM tbl_matakuliah
+                    WHERE kode_mk LIKE ?
+                    OR nama_mk LIKE ?
+                    """;
+
+            PreparedStatement ps =
+                    conn.prepareStatement(sql);
+
+            ps.setString(1,"%"+keyword+"%");
+            ps.setString(2,"%"+keyword+"%");
+
+            ResultSet rs = ps.executeQuery();
+
+            while(rs.next()){
+
+                list.add(
+
+                        new MataKuliah(
+
+                                rs.getString("kode_mk"),
+
+                                rs.getString("nama_mk"),
+
+                                rs.getInt("sks"),
+
+                                rs.getString("nidn")
+
+                        )
+
+                );
+
             }
+
+        } catch (Exception e){
+
+            e.printStackTrace();
+
         }
+
         return list;
+
     }
+
 }
