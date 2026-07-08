@@ -1,66 +1,111 @@
 package gui;
 
+import model.Person;
+import service.LoginService;
+import service.Session;
+
 import javax.swing.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
+import java.awt.*;
 
 public class LoginForm extends JFrame {
 
+    private JTextField txtUsername;
+    private JPasswordField txtPassword;
+    private JButton btnLogin;
+
     public LoginForm() {
 
-        setTitle("Login");
-        setSize(400, 250);
-        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        setTitle("Sistem Informasi Akademik");
+        setSize(400,250);
         setLocationRelativeTo(null);
+        setDefaultCloseOperation(EXIT_ON_CLOSE);
 
-        JLabel lblUser = new JLabel("Username");
-        JTextField txtUser = new JTextField();
+        initComponents();
 
-        JLabel lblPass = new JLabel("Password");
-        JPasswordField txtPass = new JPasswordField();
-
-        JButton btnLogin = new JButton("Login");
-
-        setLayout(null);
-
-        lblUser.setBounds(50,40,100,25);
-        txtUser.setBounds(150,40,150,25);
-
-        lblPass.setBounds(50,80,100,25);
-        txtPass.setBounds(150,80,150,25);
-
-        btnLogin.setBounds(150,130,100,30);
-
-        add(lblUser);
-        add(txtUser);
-        add(lblPass);
-        add(txtPass);
-        add(btnLogin);
-
-        // EVENT LOGIN
-        btnLogin.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-
-                String username = txtUser.getText();
-                String password = String.valueOf(txtPass.getPassword());
-
-                if(username.equals("admin") && password.equals("123")) {
-
-                    DashboardForm dashboard = new DashboardForm();
-                    dashboard.setVisible(true);
-
-                    dispose(); // menutup LoginForm
-
-                } else {
-
-                    JOptionPane.showMessageDialog(
-                            null,
-                            "Username atau Password Salah!"
-                    );
-
-                }
-            }
-        });
     }
+
+    private void initComponents(){
+
+        JLabel lblTitle = new JLabel("LOGIN SISTEM AKADEMIK");
+        lblTitle.setFont(new Font("Arial",Font.BOLD,18));
+
+        JLabel lblUsername = new JLabel("Username");
+
+        JLabel lblPassword = new JLabel("Password");
+
+        txtUsername = new JTextField();
+
+        txtPassword = new JPasswordField();
+
+        btnLogin = new JButton("LOGIN");
+
+        btnLogin.addActionListener(e->login());
+
+        JPanel panel = new JPanel(new GridLayout(0,1,10,10));
+
+        panel.setBorder(BorderFactory.createEmptyBorder(20,20,20,20));
+
+        panel.add(lblTitle);
+
+        panel.add(lblUsername);
+
+        panel.add(txtUsername);
+
+        panel.add(lblPassword);
+
+        panel.add(txtPassword);
+
+        panel.add(btnLogin);
+
+        add(panel);
+
+    }
+
+    private void login(){
+
+        String username = txtUsername.getText();
+
+        String password = String.valueOf(txtPassword.getPassword());
+
+        LoginService service = new LoginService();
+
+        Person person = service.login(username,password);
+
+        if(person==null){
+
+            JOptionPane.showMessageDialog(this,
+                    "Username atau Password Salah!");
+
+            return;
+
+        }
+
+        Session.login(person);
+
+        dispose();
+
+        switch (person.getRole()){
+
+            case "ADMIN":
+
+                new DashboardAdmin().setVisible(true);
+
+                break;
+
+            case "DOSEN":
+
+                new DashboardDosen().setVisible(true);
+
+                break;
+
+            case "MAHASISWA":
+
+                new DashboardMahasiswa().setVisible(true);
+
+                break;
+
+        }
+
+    }
+
 }
