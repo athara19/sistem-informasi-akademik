@@ -2,23 +2,14 @@ package model;
 
 public abstract class Person {
 
-    // =========================
-    // ATRIBUT
-    // =========================
     protected String id;
     protected String nama;
     protected String username;
     protected String password;
 
-    // =========================
-    // CONSTRUCTOR KOSONG
-    // =========================
     public Person() {
     }
 
-    // =========================
-    // CONSTRUCTOR BERPARAMETER
-    // =========================
     public Person(String id, String nama, String username, String password) {
         this.id = id;
         this.nama = nama;
@@ -26,9 +17,6 @@ public abstract class Person {
         this.password = password;
     }
 
-    // =========================
-    // GETTER & SETTER
-    // =========================
     public String getId() {
         return id;
     }
@@ -61,8 +49,6 @@ public abstract class Person {
         this.password = password;
     }
 
-    // =========================
-    // ABSTRACT METHOD
-    // =========================
-    public abstract void showDashboard();
+    public abstract String getRole();
+
 }

@@ -1,18 +1,39 @@
 package model;
 
-public class Mahasiswa {
+public class Mahasiswa extends Person {
 
     private String nim;
-    private String nama;
     private String prodi;
     private int semester;
 
-    public Mahasiswa() {
+    public Mahasiswa(String text, String txtNamaText, String txtProdiText, int i) {
     }
 
-    public Mahasiswa(String nim, String nama, String prodi, int semester) {
+    // Constructor untuk DAO (tanpa password)
+    public Mahasiswa(String nim,
+                     String nama,
+                     String prodi,
+                     int semester,
+                     String username) {
+
+        super(nim, nama, username, "");
+
         this.nim = nim;
-        this.nama = nama;
+        this.prodi = prodi;
+        this.semester = semester;
+    }
+
+    // Constructor untuk Login / Session (dengan password)
+    public Mahasiswa(String nim,
+                     String nama,
+                     String prodi,
+                     int semester,
+                     String username,
+                     String password) {
+
+        super(nim, nama, username, password);
+
+        this.nim = nim;
         this.prodi = prodi;
         this.semester = semester;
     }
@@ -23,14 +44,6 @@ public class Mahasiswa {
 
     public void setNim(String nim) {
         this.nim = nim;
-    }
-
-    public String getNama() {
-        return nama;
-    }
-
-    public void setNama(String nama) {
-        this.nama = nama;
     }
 
     public String getProdi() {
@@ -49,31 +62,8 @@ public class Mahasiswa {
         this.semester = semester;
     }
 
-    public void lihatProfil() {
-        System.out.println("Menampilkan profil mahasiswa");
-    }
-
-    public void isiKRS() {
-        System.out.println("Mengambil mata kuliah");
-    }
-
-    public void lihatJadwal() {
-        System.out.println("Menampilkan jadwal");
-    }
-
-    public void lihatNilai() {
-        System.out.println("Menampilkan nilai");
-    }
-
-    public void lihatKHS() {
-        System.out.println("Menampilkan KHS");
-    }
-
-    public void lihatTranskrip() {
-        System.out.println("Menampilkan transkrip");
-    }
-
-    public void logout() {
-        System.out.println("Logout berhasil");
+    @Override
+    public String getRole() {
+        return "MAHASISWA";
     }
 }

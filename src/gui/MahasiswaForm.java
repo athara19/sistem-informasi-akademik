@@ -1,117 +1,322 @@
 package gui;
 
+import dao.MahasiswaDAO;
 import model.Mahasiswa;
 
 import javax.swing.*;
+import javax.swing.table.DefaultTableModel;
 import java.awt.*;
+import java.util.List;
 
 public class MahasiswaForm extends JFrame {
 
-    private Mahasiswa mahasiswa;
+    private JTextField txtNim, txtNama, txtProdi, txtSemester, txtCari;
+    private JButton btnTambah, btnEdit, btnHapus, btnCari, btnRefresh;
+    private JTable table;
+    private DefaultTableModel tableModel;
+    private MahasiswaDAO mahasiswaDAO;
 
     public MahasiswaForm() {
 
-        mahasiswa = new Mahasiswa(
-                "231001",
-                "Budi Santoso",
-                "Informatika",
-                4
-        );
+        mahasiswaDAO = new MahasiswaDAO();
 
-        setTitle("Dashboard Mahasiswa");
-        setSize(600, 500);
+        setTitle("Kelola Data Mahasiswa");
+        setSize(700,500);
         setLocationRelativeTo(null);
-        setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+        setLayout(new BorderLayout(10,10));
 
-        setLayout(new BorderLayout());
+        JPanel panelForm = new JPanel(new GridLayout(4,2,5,5));
+        panelForm.setBorder(BorderFactory.createTitledBorder("Input Data Mahasiswa"));
 
-        // Header
-        JLabel lblTitle = new JLabel(
-                "SISTEM INFORMASI AKADEMIK MAHASISWA",
-                SwingConstants.CENTER
+        panelForm.add(new JLabel("NIM :"));
+        txtNim = new JTextField();
+        panelForm.add(txtNim);
+
+        panelForm.add(new JLabel("Nama :"));
+        txtNama = new JTextField();
+        panelForm.add(txtNama);
+
+        panelForm.add(new JLabel("Prodi :"));
+        txtProdi = new JTextField();
+        panelForm.add(txtProdi);
+
+        panelForm.add(new JLabel("Semester :"));
+        txtSemester = new JTextField();
+        panelForm.add(txtSemester);
+
+        JPanel panelAksi = new JPanel(new FlowLayout());
+
+        btnTambah = new JButton("Tambah");
+        btnEdit = new JButton("Edit");
+        btnHapus = new JButton("Hapus");
+
+        panelAksi.add(btnTambah);
+        panelAksi.add(btnEdit);
+        panelAksi.add(btnHapus);
+
+        JPanel panelCari = new JPanel(new FlowLayout(FlowLayout.RIGHT));
+
+        txtCari = new JTextField(15);
+
+        btnCari = new JButton("Cari");
+
+        btnRefresh = new JButton("Refresh");
+
+        panelCari.add(new JLabel("Cari Nama / NIM :"));
+
+        panelCari.add(txtCari);
+
+        panelCari.add(btnCari);
+
+        panelCari.add(btnRefresh);
+
+        JPanel panelAtas = new JPanel(new BorderLayout());
+
+        panelAtas.add(panelForm,BorderLayout.NORTH);
+
+        panelAtas.add(panelAksi,BorderLayout.CENTER);
+
+        panelAtas.add(panelCari,BorderLayout.SOUTH);
+
+        add(panelAtas,BorderLayout.NORTH);
+
+        tableModel = new DefaultTableModel(
+
+                new String[]{
+                        "NIM",
+                        "Nama",
+                        "Prodi",
+                        "Semester",
+                        "Username"
+                },0
+
         );
 
-        lblTitle.setFont(new Font("Arial", Font.BOLD, 18));
-        lblTitle.setBorder(BorderFactory.createEmptyBorder(20,10,20,10));
+        table = new JTable(tableModel);
 
-        add(lblTitle, BorderLayout.NORTH);
+        add(new JScrollPane(table),BorderLayout.CENTER);
 
-        // Menu
-        JPanel menuPanel = new JPanel();
-        menuPanel.setLayout(new GridLayout(7,1,10,10));
-        menuPanel.setBorder(BorderFactory.createEmptyBorder(20,50,20,50));
+        btnTambah.addActionListener(e->tambahData());
+        btnEdit.addActionListener(e->editData());
+        btnHapus.addActionListener(e->hapusData());
+        btnRefresh.addActionListener(e->loadData());
+        btnCari.addActionListener(e->cariData());
 
-        JButton btnProfil = new JButton("Lihat Profil");
-        JButton btnKRS = new JButton("Ambil Mata Kuliah (KRS)");
-        JButton btnJadwal = new JButton("Lihat Jadwal");
-        JButton btnNilai = new JButton("Lihat Nilai");
-        JButton btnKHS = new JButton("Lihat KHS");
-        JButton btnTranskrip = new JButton("Lihat Transkrip");
-        JButton btnLogout = new JButton("Logout");
+        table.getSelectionModel().addListSelectionListener(
+                e->isiFormDariTabel());
 
-        menuPanel.add(btnProfil);
-        menuPanel.add(btnKRS);
-        menuPanel.add(btnJadwal);
-        menuPanel.add(btnNilai);
-        menuPanel.add(btnKHS);
-        menuPanel.add(btnTranskrip);
-        menuPanel.add(btnLogout);
+        loadData();
 
-        add(menuPanel, BorderLayout.CENTER);
+    }
+    private void tambahData() {
 
-        // Event
-        btnProfil.addActionListener(e -> {
+        if (!validasiInput()) return;
 
-            JOptionPane.showMessageDialog(this,
-                    "NIM : " + mahasiswa.getNim() +
-                            "\nNama : " + mahasiswa.getNama() +
-                            "\nProdi : " + mahasiswa.getProdi() +
-                            "\nSemester : " + mahasiswa.getSemester()
+        try {
+
+            Mahasiswa mahasiswa = new Mahasiswa(
+                    txtNim.getText(),
+                    txtNama.getText(),
+                    txtProdi.getText(),
+                    Integer.parseInt(txtSemester.getText()),
+                    txtNim.getText()
             );
 
-        });
+            boolean berhasil = mahasiswaDAO.insertMahasiswa(mahasiswa);
 
-        btnKRS.addActionListener(e ->
+            if (berhasil) {
+
                 JOptionPane.showMessageDialog(this,
-                        "Menu Pengambilan KRS")
-        );
+                        "Data berhasil ditambah!\n\n" +
+                                "Username : " + txtNim.getText() +
+                                "\nPassword : " + txtNim.getText());
 
-        btnJadwal.addActionListener(e ->
+                kosongkanForm();
+                loadData();
+
+            } else {
+
                 JOptionPane.showMessageDialog(this,
-                        "Menu Jadwal Kuliah")
-        );
-
-        btnNilai.addActionListener(e ->
-                JOptionPane.showMessageDialog(this,
-                        "Menu Nilai")
-        );
-
-        btnKHS.addActionListener(e ->
-                JOptionPane.showMessageDialog(this,
-                        "Menu KHS")
-        );
-
-        btnTranskrip.addActionListener(e ->
-                JOptionPane.showMessageDialog(this,
-                        "Menu Transkrip Nilai")
-        );
-
-        btnLogout.addActionListener(e -> {
-
-            int pilih = JOptionPane.showConfirmDialog(
-                    this,
-                    "Yakin ingin logout?",
-                    "Logout",
-                    JOptionPane.YES_NO_OPTION
-            );
-
-            if (pilih == JOptionPane.YES_OPTION) {
-
-                new LoginForm().setVisible(true);
-                dispose();
+                        "Data gagal ditambah!");
 
             }
 
-        });
+        } catch (Exception ex) {
+
+            JOptionPane.showMessageDialog(this,
+                    "Semester harus berupa angka!");
+
+        }
+
     }
+
+    private void editData() {
+
+        if (!validasiInput()) return;
+
+        try {
+
+            Mahasiswa mahasiswa = new Mahasiswa(
+                    txtNim.getText(),
+                    txtNama.getText(),
+                    txtProdi.getText(),
+                    Integer.parseInt(txtSemester.getText()),
+                    txtNim.getText()
+            );
+
+            if (mahasiswaDAO.updateMahasiswa(mahasiswa)) {
+
+                JOptionPane.showMessageDialog(this,
+                        "Data berhasil diubah!");
+
+                kosongkanForm();
+                loadData();
+
+            } else {
+
+                JOptionPane.showMessageDialog(this,
+                        "Data gagal diubah!");
+
+            }
+
+        } catch (Exception ex) {
+
+            JOptionPane.showMessageDialog(this,
+                    ex.getMessage());
+
+        }
+
+    }
+
+    private void hapusData() {
+
+        String nim = txtNim.getText();
+
+        if (nim.isEmpty()) {
+
+            JOptionPane.showMessageDialog(this,
+                    "Pilih data terlebih dahulu!");
+
+            return;
+
+        }
+
+        int confirm = JOptionPane.showConfirmDialog(
+                this,
+                "Yakin hapus data?",
+                "Konfirmasi",
+                JOptionPane.YES_NO_OPTION
+        );
+
+        if (confirm == JOptionPane.YES_OPTION) {
+
+            if (mahasiswaDAO.deleteMahasiswa(nim)) {
+
+                JOptionPane.showMessageDialog(this,
+                        "Data berhasil dihapus!");
+
+                kosongkanForm();
+                loadData();
+
+            } else {
+
+                JOptionPane.showMessageDialog(this,
+                        "Data gagal dihapus!");
+
+            }
+
+        }
+
+    }
+
+    private void loadData() {
+
+        tableModel.setRowCount(0);
+
+        List<Mahasiswa> list = mahasiswaDAO.getAllMahasiswa();
+
+        for (Mahasiswa m : list) {
+
+            tableModel.addRow(new Object[]{
+                    m.getNim(),
+                    m.getNama(),
+                    m.getProdi(),
+                    m.getSemester(),
+                    m.getUsername()
+            });
+
+        }
+
+    }
+
+    private void cariData() {
+
+        tableModel.setRowCount(0);
+
+        List<Mahasiswa> list =
+                mahasiswaDAO.searchMahasiswa(txtCari.getText());
+
+        for (Mahasiswa m : list) {
+
+            tableModel.addRow(new Object[]{
+                    m.getNim(),
+                    m.getNama(),
+                    m.getProdi(),
+                    m.getSemester(),
+                    m.getUsername()
+            });
+
+        }
+
+    }
+
+    private void isiFormDariTabel() {
+
+        int baris = table.getSelectedRow();
+
+        if (baris >= 0) {
+
+            txtNim.setText(tableModel.getValueAt(baris,0).toString());
+            txtNama.setText(tableModel.getValueAt(baris,1).toString());
+            txtProdi.setText(tableModel.getValueAt(baris,2).toString());
+            txtSemester.setText(tableModel.getValueAt(baris,3).toString());
+
+            txtNim.setEnabled(false);
+
+        }
+
+    }
+
+    private void kosongkanForm() {
+
+        txtNim.setText("");
+        txtNama.setText("");
+        txtProdi.setText("");
+        txtSemester.setText("");
+        txtCari.setText("");
+
+        txtNim.setEnabled(true);
+
+    }
+
+    private boolean validasiInput() {
+
+        if (txtNim.getText().isEmpty()
+                || txtNama.getText().isEmpty()
+                || txtProdi.getText().isEmpty()
+                || txtSemester.getText().isEmpty()) {
+
+            JOptionPane.showMessageDialog(this,
+                    "Semua kolom wajib diisi!",
+                    "Peringatan",
+                    JOptionPane.WARNING_MESSAGE);
+
+            return false;
+
+        }
+
+        return true;
+
+    }
+
 }
